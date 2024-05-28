@@ -1,0 +1,166 @@
+import { Button , ScrollView, Palette, TextEdit} from "std-widgets.slint";
+
+export struct InfoVal {
+    sno: int,
+    name: string,
+    value: string
+}
+
+export struct InfoStruct {
+    name: string,
+    props: [InfoVal]
+}
+export global ItemQueue {
+    in-out property <[InfoStruct]> card-info-list;
+}
+
+component InfoCardRow {
+    in-out property <int> sno;
+    in-out property <string> prop-name;
+    in-out property <string> prop-value;
+    padding: 4px;
+    min-height: 1rem + 16px;
+    Rectangle {
+        y: 0;
+        x: 0;
+        width: parent.width;
+        height: 1px;
+        background: rgba(240, 240, 240, 0.16);
+    }
+    HorizontalLayout {
+        padding-left:8px ;
+        spacing: 10px;
+        sno-t := Text {
+            text: sno;
+            min-width: self.font-size*2;
+            max-width: 50px;
+            horizontal-stretch: 0;
+            font-size: 1.15rem;
+            vertical-alignment: TextVerticalAlignment.center;
+            Rectangle {
+                x: -8px;
+                height: parent.height;
+                width: parent.width + parent.padding-left + 10px*2;
+                background: rgba(240 ,240 ,240 ,0.06);
+            }
+        }
+        Rectangle {
+            height: 1rem + 16px;
+            width: 1px;
+            background: rgba(240, 240, 240, 0.16);
+        }
+        Text {
+            text: prop-name;
+            horizontal-stretch: 0;
+            font-size: 1.15rem;
+            vertical-alignment: TextVerticalAlignment.center;
+            min-width: 220px;
+        }
+        Rectangle {
+            height: 1rem + 16px;
+            width: 1px;
+            background: rgba(240, 240, 240, 0.16);
+        }
+        TextInput {
+            text: prop-value;
+            horizontal-stretch: 2;
+            font-size: 1.15rem;
+            vertical-alignment: TextVerticalAlignment.center;
+            read-only: true;
+            horizontal-alignment: TextHorizontalAlignment.left;
+        }
+    }
+}
+
+export component InfoCard inherits Rectangle {
+    in-out property <InfoStruct> info;
+    background: rgba(240 ,240 ,240 ,0.04);
+    border-radius: 8px;
+    border-width: 1px;
+    max-width: 900px;
+    border-color: rgba(240, 240, 240, 0.16);
+    clip: true;
+    min-height: title-txt.min-height + (1rem + 16px)*info.props.length + 12px;
+    VerticalLayout {
+        Rectangle {
+            padding: 8px;
+            background: rgba(240 ,240 ,240 ,0.06);
+            min-height: title-txt.min-height;
+            title-txt := Text {
+                x: 8px;
+                text: info.name;
+                width: parent.width;
+                min-height: self.font-size + 20px;
+                font-size: 1.4rem;
+                vertical-alignment: TextVerticalAlignment.center;
+            }
+        }
+        Rectangle {
+            VerticalLayout {
+                //padding-top: 6px;
+                //padding-bottom: 6px;
+                property <int> no;
+                no: 0;
+                for item[index] in info.props: InfoCardRow {
+                    sno: item.sno;
+                    prop-name: item.name;
+                    prop-value: item.value;
+                }
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
+    min-height: 400px;
+    min-width: 640px;
+    title: "License Status";
+    callback run_btn_clicked <=> runBtn.clicked;
+    in-out property btn-enabled <=> runBtn.enabled;
+    in-out property bg-color <=> self.background;
+    in property <[InfoStruct]> card-info-list;
+    background: rgb(20, 20, 20);
+    default-font-family: "Segoe UI";
+    VerticalLayout {
+        titleArea := HorizontalLayout {
+            padding: 8px;
+            Text {
+                text: "License Status Checker";
+                font-size: 1.4rem;
+                vertical-alignment: TextVerticalAlignment.center;
+            }
+            runBtn := Button {
+                max-width: 50px;
+                text: "Check";
+                primary: true;
+            }
+        }
+        Rectangle {
+            visible: runBtn.enabled ? false : true;
+            height: runBtn.enabled ? 1px : 1rem + 10px;
+            opacity: runBtn.enabled ? 0 : 1;
+            animate opacity {
+                delay: 100ms;
+                duration: 150ms;
+            }
+            statusText := Text {
+                vertical-stretch: 1;
+                horizontal-alignment: TextHorizontalAlignment.center;
+                vertical-alignment: TextVerticalAlignment.center;
+                height: parent.height;
+                text: "Getting Data";
+            }
+        }
+        mainScroll := ScrollView { 
+            //vertical-stretch: 2;
+            VerticalLayout {
+                width: min(parent.width - 20px, 1100px);
+                spacing: 8px;
+                //InfoCard { max-width: 900px;}
+                for item[index] in card-info-list: InfoCard {
+                    info: item;
+                }
+            }
+        }
+    }
+}

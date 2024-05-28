@@ -27,7 +27,7 @@ impl GetPcwstr for str {
 slint::slint!(import { ItemQueue, InfoStruct, InfoVal } from "./src/slint/main.slint";);
 
 fn callback_handler(info: HashMap<String, String>,
-                        window: Weak<MainWindow>) {
+                    window: Weak<MainWindow>) {
     slint::invoke_from_event_loop(move ||{
         let vals = Rc::new(VecModel::<InfoVal>::from(vec![]));
         let mut non_blank_vals = 1;

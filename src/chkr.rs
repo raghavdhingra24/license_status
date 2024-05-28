@@ -7,11 +7,11 @@ pub fn get_license_info(callback: fn(HashMap<String, String>, crate::Weak<crate:
     
     let output = String::from_utf8_lossy(&cmd.stdout);
     let split = output.split("\r\n\r");
-    for item in split {
+    for license in split {
         let mut val_map:HashMap<String, String> = HashMap::new();
-        for items in item.split('\n'){
-            if items.contains(": ") {
-                let sv: Vec<_> = items.split(": ").collect();
+        for line in license.split('\n'){
+            if line.contains(": ") {
+                let sv: Vec<_> = line.split(": ").collect();
                 let body = sv[1].trim().to_string();
                 if body.len() > 1 {
                     val_map.insert(String::from(sv[0]), body);

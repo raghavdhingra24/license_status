@@ -152,11 +152,9 @@ export component MainWindow inherits Window {
             }
         }
         mainScroll := ScrollView { 
-            //vertical-stretch: 2;
             VerticalLayout {
                 width: min(parent.width - 20px, 1100px);
                 spacing: 8px;
-                //InfoCard { max-width: 900px;}
                 for item[index] in card-info-list: InfoCard {
                     info: item;
                 }

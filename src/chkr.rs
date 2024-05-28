@@ -1,6 +1,4 @@
 use std::{collections::HashMap, process::*};
-// use std::rc::Rc;
-// slint::include_modules!();
 
 pub fn get_license_info(callback: fn(HashMap<String, String>, crate::Weak<crate::MainWindow>) -> (),
                             window: crate::Weak<crate::MainWindow>) {
@@ -9,7 +7,6 @@ pub fn get_license_info(callback: fn(HashMap<String, String>, crate::Weak<crate:
     
     let output = String::from_utf8_lossy(&cmd.stdout);
     let split = output.split("\r\n\r");
-    // println!("{:?}", split);
     for item in split {
         let mut val_map:HashMap<String, String> = HashMap::new();
         for items in item.split('\n'){
@@ -17,9 +14,7 @@ pub fn get_license_info(callback: fn(HashMap<String, String>, crate::Weak<crate:
                 let sv: Vec<_> = items.split(": ").collect();
                 let body = sv[1].trim().to_string();
                 if body.len() > 1 {
-                    // println!("{}: {}", body, body.len());
                     val_map.insert(String::from(sv[0]), body);
-                    // println!("{:?}", val_map);
                 }
             }
         }

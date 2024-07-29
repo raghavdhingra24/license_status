@@ -97,7 +97,8 @@ fn main() {
         let win_build = get_windows_build();
         if win_build > 22523 {
             if let raw_window_handle::RawWindowHandle::Win32(win_id) = win_id {
-                let hwnd = HWND(win_id.hwnd.get());
+                let hwnd = win_id.hwnd.clone();
+                let hwnd = HWND(std::ptr::addr_of!(hwnd) as *mut c_void);
                 unsafe {
                     let mut margins = MARGINS::default();
                     margins.cxLeftWidth = -1;
@@ -146,6 +147,13 @@ fn main() {
     let win: Weak<MainWindow> = window.as_weak();
     window.on_run_btn_clicked(move || {
         run_btn_pressed(win.clone());
+    });
+    window.on_repo_open(move || {
+        let result = open::that_detached("https://github.com/raghavdhingra24/license_status");
+        match result {
+            Ok(()) => println!("Successfully opened repo"),
+            Err(err) => eprintln!("An error occurred: {err}")
+        }
     });
     window.run().unwrap();
 }

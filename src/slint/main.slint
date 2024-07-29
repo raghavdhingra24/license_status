@@ -1,4 +1,4 @@
-import { Button , ScrollView, Palette, TextEdit} from "std-widgets.slint";
+import { Button , ScrollView, Palette, TextEdit, AboutSlint, HorizontalBox, StandardButton, VerticalBox} from "std-widgets.slint";
 
 export struct InfoVal {
     sno: int,
@@ -12,6 +12,51 @@ export struct InfoStruct {
 }
 export global ItemQueue {
     in-out property <[InfoStruct]> card-info-list;
+}
+
+component AboutButton inherits Rectangle {
+    in-out property <bool> enabled;
+    touch := TouchArea {
+        clicked => {
+            if (root.enabled) {
+                root.clicked();
+            };
+        }
+        fc := FocusScope {
+            height: 0;
+            width: 0;
+            key-pressed(event) => {
+                if (event.text == "\u{0009}") {
+                    reject
+                    // self.forward-focus;
+                } else if (event.text == "\n" || event.text == " ") {
+                    touch.clicked();
+                    accept
+                } else {
+                    accept
+                }
+            }
+        }
+    }
+    callback clicked();
+    enabled: true;
+    border-width: fc.has-focus ? 2px : 1px;
+    border-color: #6a6a6a;
+    padding: 5px;
+    accessible-role: AccessibleRole.button;
+    background: self.enabled ? touch.pressed ? rgba(255, 255, 255, 0.08) : touch.has-hover ? rgba(255, 255, 255, 0.1) : rgba(255, 255, 255, 0) : rgba(255, 255, 255, 0.2);
+    txt := Text {
+        x: (parent.width - self.width)/2;
+        y: (parent.height - self.height)/2;
+        font-size: 1.1rem;
+        text: "i";
+    }
+    animate background {
+        duration: 100ms;
+    }
+    height: txt.height + 12px;
+    width: self.height;
+    border-radius: self.height/2;
 }
 
 component InfoCardRow {
@@ -109,11 +154,110 @@ export component InfoCard inherits Rectangle {
     }
 }
 
+component TextButton inherits Rectangle {
+    in-out property <bool> enabled;
+    in-out property <string> text;
+    enabled: true;
+    callback clicked();
+    touch := TouchArea {
+        mouse-cursor: MouseCursor.pointer;
+        clicked => {
+            if (root.enabled) {
+                root.clicked();
+            };
+        }
+        fc := FocusScope {
+            height: 0;
+            width: 0;
+            key-pressed(event) => {
+                if (event.text == "\u{0009}") {
+                    reject
+                    // self.forward-focus;
+                } else if (event.text == "\n" || event.text == " ") {
+                    touch.clicked();
+                    accept
+                } else {
+                    accept
+                }
+            }
+        }
+    }
+    text: "Text Button";
+    accessible-role: AccessibleRole.button;
+    accessible-value: "Button: "+text;
+    accessible-checkable: false;
+    background: touch.pressed? rgba(255, 255, 255, 0.04): touch.has-hover? rgba(255, 255, 255, 0.08): rgba(255, 255, 255, 0);
+    border-radius: self.height/4;
+    height: btn-text.height + self.padding*2;
+    width: btn-text.width + self.padding*2;
+    btn-text := Text {
+        text: text;
+        color: Palette.accent-background;
+    }
+    animate background {
+         duration: 100ms;
+    }
+}
+
+component AboutDialog inherits Dialog {
+    visible: false;
+    callback open_repo();
+    callback hide();
+    hide => {
+        self.visible = false;
+    }
+    r := Rectangle {
+        horizontal-stretch: 1;
+        vertical-stretch: 1;
+        background: rgb(40, 40, 40);
+        border-radius: 8px;
+        border-width: 1px;
+        border-color: rgba(255, 255, 255, 0.08);
+        VerticalLayout {
+            padding: 10px;
+            spacing: 5px;
+            alignment: LayoutAlignment.start;
+            Text {
+                text: "License Status";
+                font-size: 18pt;
+                horizontal-alignment: TextHorizontalAlignment.center;
+            }
+            VerticalBox {
+                Text {
+                    text: "A lightweight UI to show all the licenses installed in Windows";
+                    horizontal-alignment: TextHorizontalAlignment.center;
+                }
+                HorizontalBox {
+                    spacing: 0;
+                    padding: 0px;
+                    alignment: LayoutAlignment.center;
+                    Text {
+                        text: "Check out the Github repo ";
+                    }
+                    TextButton {
+                        text: "here";
+                        clicked => {
+                            root.open_repo();
+                        }
+                    }
+                }
+            }
+            Button {
+                text: "Close";
+                clicked => {
+                    root.visible = false;
+                }
+            }
+        }
+    }
+    }
+
 export component MainWindow inherits Window {
     min-height: 400px;
     min-width: 640px;
     title: "License Status";
     callback run_btn_clicked <=> runBtn.clicked;
+    callback repo_open <=> aboutDialog.open_repo;
     in-out property btn-enabled <=> runBtn.enabled;
     in-out property bg-color <=> self.background;
     in property <[InfoStruct]> card-info-list;
@@ -122,10 +266,19 @@ export component MainWindow inherits Window {
     VerticalLayout {
         titleArea := HorizontalLayout {
             padding: 8px;
-            Text {
-                text: "License Status Checker";
-                font-size: 1.4rem;
-                vertical-alignment: TextVerticalAlignment.center;
+            HorizontalLayout {
+                alignment: LayoutAlignment.start;
+                spacing: 10px;
+                Text {
+                    text: "License Status Checker";
+                    font-size: 1.4rem;
+                    vertical-alignment: TextVerticalAlignment.center;
+                }
+                AboutButton {
+                    clicked => {
+                        aboutDialog.visible = true;
+                    }
+                }
             }
             runBtn := Button {
                 max-width: 50px;
@@ -157,6 +310,19 @@ export component MainWindow inherits Window {
                     info: item;
                 }
             }
+        }
+    }
+    Rectangle {
+        TouchArea {
+        }
+        visible: aboutDialog.visible;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: aboutDialog.visible ? 1 : 0;
+        animate opacity {
+            duration: 150ms;
+        }
+        aboutDialog := AboutDialog {
+
         }
     }
 }

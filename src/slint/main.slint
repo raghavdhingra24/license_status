@@ -1,4 +1,4 @@
-import { Button , ScrollView, Palette, TextEdit, AboutSlint, HorizontalBox, StandardButton, VerticalBox} from "std-widgets.slint";
+import { Button , ScrollView, Palette, TextEdit, AboutSlint, HorizontalBox, VerticalBox} from "std-widgets.slint";
 
 export struct InfoVal {
     sno: int,
@@ -117,7 +117,7 @@ component InfoCardRow {
     }
 }
 
-export component InfoCard inherits Rectangle {
+component InfoCard inherits Rectangle {
     in-out property <InfoStruct> info;
     background: rgba(240 ,240 ,240 ,0.04);
     border-radius: 8px;
@@ -157,6 +157,7 @@ export component InfoCard inherits Rectangle {
 component TextButton inherits Rectangle {
     in-out property <bool> enabled;
     in-out property <string> text;
+    out property <bool> has-focus <=> fc.has-focus;
     enabled: true;
     callback clicked();
     touch := TouchArea {
@@ -200,9 +201,9 @@ component TextButton inherits Rectangle {
 }
 
 component AboutDialog inherits Dialog {
-    visible: false;
     callback open_repo();
     callback hide();
+    visible: false;
     hide => {
         self.visible = false;
     }
@@ -234,10 +235,17 @@ component AboutDialog inherits Dialog {
                     Text {
                         text: "Check out the Github repo ";
                     }
-                    TextButton {
-                        text: "here";
-                        clicked => {
-                            root.open_repo();
+                    VerticalLayout {
+                        rb := TextButton {
+                            text: "here";
+                            clicked => {
+                                root.open_repo();
+                            }
+                        }
+                        Rectangle {
+                            height: 1px;
+                            width: rb.width;
+                            background: rb.has-focus ? Palette.accent-background : transparent;
                         }
                     }
                 }
@@ -250,7 +258,7 @@ component AboutDialog inherits Dialog {
             }
         }
     }
-    }
+}
 
 export component MainWindow inherits Window {
     min-height: 400px;

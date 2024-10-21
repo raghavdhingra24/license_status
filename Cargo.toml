@@ -7,13 +7,13 @@ build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-slint = {version = "1.7.0" , default-features = false, features=["compat-1-2", "std", "backend-winit", "renderer-skia-opengl", "accessibility"]}
+slint = {version = "1.8.0" , default-features = false, features=["compat-1-2", "std", "backend-winit", "renderer-skia-opengl", "accessibility"]}
 raw-window-handle = "0.6.1"
-i-slint-backend-winit = "1.7.0"
+i-slint-backend-winit = "1.8.0"
 open = "5.3.0"
 
 [dependencies.windows]
-version = "0.58"
+version = "0.57"
 features = [
     "Win32_Foundation",
     "Win32_Graphics_Dwm",
@@ -22,4 +22,4 @@ features = [
 ]
 
 [build-dependencies]
-slint-build = "1.7.0"
+slint-build = "1.8.0"

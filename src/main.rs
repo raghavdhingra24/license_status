@@ -97,8 +97,8 @@ fn main() {
         let win_build = get_windows_build();
         if win_build > 22523 {
             if let raw_window_handle::RawWindowHandle::Win32(win_id) = win_id {
-                let hwnd = win_id.hwnd.clone();
-                let hwnd = HWND(std::ptr::addr_of!(hwnd) as *mut c_void);
+                let hwnd = win_id.hwnd.get().clone();
+                let hwnd = HWND(hwnd);
                 unsafe {
                     let mut margins = MARGINS::default();
                     margins.cxLeftWidth = -1;
@@ -127,8 +127,8 @@ fn main() {
             if let raw_window_handle::RawWindowHandle::Win32(win_id) = win_id {
                 let hwnd = HWND(win_id.hwnd.get());
                 unsafe {
-                    let val = BOOL(0);
-                    let val_size = std::mem::size_of::<BOOL>() as u32;
+                    let val = windows::Win32::Foundation::BOOL(0);
+                    let val_size = std::mem::size_of::<windows::Win32::Foundation::BOOL>() as u32;
                     println!("{val_size}");
                     let r = DwmSetWindowAttribute(hwnd,
                         DWMWA_USE_IMMERSIVE_DARK_MODE,
